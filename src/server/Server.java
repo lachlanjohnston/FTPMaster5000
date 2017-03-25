@@ -9,13 +9,13 @@ import java.util.ArrayList;
  */
 public class Server {
 
-
     public static void main(String[] args) throws IOException {
         ServerSocket serverSocket = new ServerSocket(1337);
-        ArrayList<Connection> connections = new ArrayList<>();
+        ArrayList<ConnectionHandler> connectionHandlers = new ArrayList<>();
+
         while (true) {
-            connections.add(new Connection(serverSocket.accept()));
-            connections.get(connections.size() - 1).start();
+            connectionHandlers.add(new ConnectionHandler(serverSocket.accept()));
+            connectionHandlers.get(connectionHandlers.size() - 1).start();
         }
     }
 }
