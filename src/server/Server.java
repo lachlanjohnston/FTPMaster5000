@@ -14,7 +14,11 @@ public class Server {
         ArrayList<ConnectionHandler> connectionHandlers = new ArrayList<>();
 
         while (true) {
-            connectionHandlers.add(new ConnectionHandler(serverSocket.accept()));
+            try {
+                connectionHandlers.add(new ConnectionHandler(serverSocket.accept()));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             connectionHandlers.get(connectionHandlers.size() - 1).start();
         }
     }

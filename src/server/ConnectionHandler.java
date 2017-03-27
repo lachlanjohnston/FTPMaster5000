@@ -12,52 +12,49 @@ import java.util.List;
  */
 public class ConnectionHandler extends Thread {
     private Socket connectionSocket;
+    DataOutputStream dataOutputStream;
+    DataInputStream dataInputStream;
 
-    ConnectionHandler(Socket connectionSocket) {
+    ConnectionHandler(Socket connectionSocket) throws Exception {
         this.connectionSocket = connectionSocket;
+        dataInputStream = new DataInputStream(connectionSocket.getInputStream());
+        dataOutputStream = new DataOutputStream(connectionSocket.getOutputStream());
     }
 
     @Override
     public void run() {
         try {
-            System.out.println("New connection!");
-            InputStream is = connectionSocket.getInputStream();
-            File file = new File("./Server");
             byte[] data = new byte[1024];
 
-            is.read(data);
-            String clientRequest = new String(data);
-            int length = Integer.parseInt(clientRequest.split(" ")[0]);
-            clientRequest = clientRequest.substring(0, length);
-
-            String[] commandData = clientRequest.split(" ");
-            String command = commandData[1];
-            String filePath = commandData[2];
+            String[] commandIn = dataInputStream.readUTF().split(" ");
+            String command = commandIn[0];
 
             switch (command) {
                 case "DIR":
                     System.out.println("Sending directory listing!");
 
+                    File file = new File("Server/");
+
                     File[] dirListing = file.listFiles();
                     ObjectOutputStream os = new ObjectOutputStream(connectionSocket.getOutputStream());
 
                     os.writeObject(dirListing);
+                    os.flush();
 
                     break;
                 case "UPLOAD":
                     System.out.println("Receiving File!");
 
-                    File upload = new File("Server/" + filePath);
-                    //System.out.println(upload.getName());
-                    OutputStream fileWriter = new FileOutputStream(upload);
+                    int fileSize = dataInputStream.readInt();
+                    int read = 0;
+                    data = new byte[fileSize];
+                    while(read != fileSize)
+                        read += dataInputStream.read(data,0, fileSize);
 
 
-                    while (is.read(data) >= 0) {
-                        //System.out.print(data);
-                        fileWriter.write(data);
-                    }
-
-                    fileWriter.flush();
+                    FileOutputStream fileOutputStream = new FileOutputStream(new File("Server/" + commandIn[1]));
+                    fileOutputStream.write(data);
+                    fileOutputStream.flush();
 
                     System.out.println("Done!");
 
