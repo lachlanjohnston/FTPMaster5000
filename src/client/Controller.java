@@ -6,16 +6,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class Controller {
 
@@ -78,7 +72,6 @@ public class Controller {
         File selected = clientList.getFocusModel().getFocusedItem();
 
         DataOutputStream dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
-        DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
         FileInputStream fileInputStream = new FileInputStream(selected);
 
         dataOutputStream.writeUTF("UPLOAD " + selected.getName());
@@ -104,7 +97,32 @@ public class Controller {
         serverFiles.addAll(getDirectoryListing());
     }
 
-    public void download(ActionEvent e) {
+    public void download(ActionEvent e) throws Exception {
+        Socket clientSocket = new Socket("localhost", 1337);
 
+        File selected = serverList.getFocusModel().getFocusedItem();
+
+        DataOutputStream dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
+        DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
+        FileOutputStream fileOutputStream = new FileOutputStream(
+                new File(workingDirectory + selected.getName()));
+
+        dataOutputStream.writeUTF("DOWNLOAD " + selected.getName());
+        dataOutputStream.flush();
+
+        int fileSize = dataInputStream.readInt();
+
+        byte[] data = new byte[fileSize];
+        int read = 0;
+        while (read != fileSize) {
+            read += dataInputStream.read(data);
+            fileOutputStream.write(data);
+            fileOutputStream.flush();
+        }
+
+        fileOutputStream.close();
+        clientSocket.close();
+
+        refresh();
     }
 }

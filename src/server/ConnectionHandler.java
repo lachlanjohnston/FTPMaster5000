@@ -24,7 +24,8 @@ public class ConnectionHandler extends Thread {
     @Override
     public void run() {
         try {
-            byte[] data = new byte[1024];
+            byte[] data;
+            String currentDir = "Server/";
 
             String[] commandIn = dataInputStream.readUTF().split(" ");
             String command = commandIn[0];
@@ -41,6 +42,8 @@ public class ConnectionHandler extends Thread {
                     os.writeObject(dirListing);
                     os.flush();
 
+                    connectionSocket.close();
+
                     break;
                 case "UPLOAD":
                     System.out.println("Receiving File!");
@@ -48,19 +51,40 @@ public class ConnectionHandler extends Thread {
                     int fileSize = dataInputStream.readInt();
                     int read = 0;
                     data = new byte[fileSize];
-                    while(read != fileSize)
-                        read += dataInputStream.read(data,0, fileSize);
+                    FileOutputStream fileOutputStream = new FileOutputStream(
+                            new File("Server/" + commandIn[1]));
 
+                    while(read != fileSize) {
+                        read += dataInputStream.read(data, 0, fileSize);
+                        fileOutputStream.write(data);
+                    }
 
-                    FileOutputStream fileOutputStream = new FileOutputStream(new File("Server/" + commandIn[1]));
-                    fileOutputStream.write(data);
-                    fileOutputStream.flush();
+                    fileOutputStream.close();
 
                     System.out.println("Done!");
+
+                    connectionSocket.close();
 
                     break;
                 case "DOWNLOAD":
                     System.out.println("Sending file!");
+
+                    File download = new File(currentDir + commandIn[1]);
+                    FileInputStream fileInputStream = new FileInputStream(download);
+
+                    dataOutputStream.writeInt((int) download.length());
+                    dataOutputStream.flush();
+                    data = new byte[(int) download.length()];
+
+                    fileInputStream.read(data);
+                    dataOutputStream.write(data);
+                    dataOutputStream.flush();
+
+                    fileInputStream.close();
+
+                    System.out.println("Done!");
+
+                    connectionSocket.close();
 
                     break;
             }
