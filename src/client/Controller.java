@@ -6,6 +6,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 import java.io.*;
@@ -70,20 +72,19 @@ public class Controller {
         Socket clientSocket = new Socket("localhost", 1337);
 
         File selected = clientList.getFocusModel().getFocusedItem();
+        if (selected == null) return;
 
         DataOutputStream dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
         FileInputStream fileInputStream = new FileInputStream(selected);
 
         dataOutputStream.writeUTF("UPLOAD " + selected.getName());
-        dataOutputStream.flush();
         dataOutputStream.writeInt((int) selected.length());
-        dataOutputStream.flush();
         byte[] data = new byte[(int) selected.length()];
 
         fileInputStream.read(data);
-
         dataOutputStream.write(data);
         dataOutputStream.flush();
+        fileInputStream.close();
 
         clientSocket.close();
 
@@ -101,28 +102,35 @@ public class Controller {
         Socket clientSocket = new Socket("localhost", 1337);
 
         File selected = serverList.getFocusModel().getFocusedItem();
+        if (selected == null) return;
 
         DataOutputStream dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
         DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
         FileOutputStream fileOutputStream = new FileOutputStream(
-                new File(workingDirectory + selected.getName()));
+                new File(current.getCanonicalPath(), selected.getName()).toString());
 
         dataOutputStream.writeUTF("DOWNLOAD " + selected.getName());
-        dataOutputStream.flush();
 
         int fileSize = dataInputStream.readInt();
+        System.out.println("here");
 
         byte[] data = new byte[fileSize];
         int read = 0;
         while (read != fileSize) {
             read += dataInputStream.read(data);
             fileOutputStream.write(data);
-            fileOutputStream.flush();
         }
 
         fileOutputStream.close();
         clientSocket.close();
 
+        refresh();
+    }
+
+    public void changeDirectory(ActionEvent e) throws Exception {
+        Stage stage = new Stage();
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        current = directoryChooser.showDialog(stage);
         refresh();
     }
 }

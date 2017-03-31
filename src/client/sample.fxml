@@ -7,18 +7,28 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.TextArea?>
 <BorderPane fx:controller="client.Controller" xmlns:fx="http://javafx.com/fxml">
     <top>
         <HBox>
             <Button text="Upload" onAction="#upload" />
             <Button text="Download" onAction="#download" />
+            <Button text="Change Root Directory" onAction="#changeDirectory" />
         </HBox>
     </top>
 
     <center>
         <SplitPane>
-            <ListView fx:id="clientList" />
-            <ListView fx:id="serverList" />
+            <VBox>
+                <TextArea text="Client:" maxHeight="15"/>
+                <ListView fx:id="clientList" />
+            </VBox>
+
+            <VBox>
+                <TextArea text="Remote:" maxHeight="15"/>
+                <ListView fx:id="serverList" />
+            </VBox>
         </SplitPane>
     </center>
 </BorderPane>

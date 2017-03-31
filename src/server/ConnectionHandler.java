@@ -73,7 +73,6 @@ public class ConnectionHandler extends Thread {
                     FileInputStream fileInputStream = new FileInputStream(download);
 
                     dataOutputStream.writeInt((int) download.length());
-                    dataOutputStream.flush();
                     data = new byte[(int) download.length()];
 
                     fileInputStream.read(data);
