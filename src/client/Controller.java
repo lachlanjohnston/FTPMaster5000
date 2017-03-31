@@ -117,7 +117,6 @@ public class Controller {
         dataOutputStream.writeUTF("DOWNLOAD " + selected.getName());
 
         int fileSize = dataInputStream.readInt();
-        System.out.println("here");
 
         byte[] data = new byte[fileSize];
         int read = 0;
