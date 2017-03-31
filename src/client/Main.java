@@ -12,6 +12,10 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.util.Scanner;
 
+/**
+ * Lachlan Johnston
+ * 100590934
+ */
 public class Main extends Application {
 
     @Override

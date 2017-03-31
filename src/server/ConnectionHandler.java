@@ -8,7 +8,8 @@ import java.net.Socket;
 import java.util.List;
 
 /**
- * Created by lachlan on 24/03/17.
+ * Lachlan Johnston
+ * 100590934
  */
 public class ConnectionHandler extends Thread {
     private Socket connectionSocket;

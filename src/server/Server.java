@@ -5,7 +5,8 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 
 /**
- * Created by lachlan on 24/03/17.
+ * Lachlan Johnston
+ * 100590934
  */
 public class Server {
 

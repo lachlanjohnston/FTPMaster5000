@@ -13,6 +13,11 @@ import javafx.util.Callback;
 import java.io.*;
 import java.net.Socket;
 
+/**
+ * Lachlan Johnston
+ * 100590934
+ */
+
 public class Controller {
 
     @FXML ListView<File> clientList;
